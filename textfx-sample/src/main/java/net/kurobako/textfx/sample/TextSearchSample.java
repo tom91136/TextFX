@@ -6,31 +6,26 @@ import net.kurobako.textfx.sample.SamplerController.Sample;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-@SuppressWarnings("UnstableApiUsage")
 public class TextSearchSample implements Sample {
-
 
 
 	@Override public Node mkRoot() {
 
 
-		String join = String.join("\n", SampleText.loremIpsum());
+		String join = String.join("\n", SampleText.load("lorem_ipsum.txt"));
 
 
 		var haystack = new Label(join);
@@ -49,15 +44,13 @@ public class TextSearchSample implements Sample {
 		VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
 
-
-
 		Button addNeedle = new Button("Add search");
 		VBox needles = new VBox();
 		needles.setSpacing(4);
 		var rand = new Random(42);
 
 
-		Consumer<String > addRow = string -> {
+		Consumer<String> addRow = string -> {
 
 			var needle = new TextField();
 
@@ -65,7 +58,8 @@ public class TextSearchSample implements Sample {
 			var remove = new Button("Remove");
 
 
-			var picker = new ColorPicker(Color.color( rand.nextDouble(),  rand.nextDouble(),  rand.nextDouble(), 0.8));
+			var picker = new ColorPicker(Color.color(rand.nextDouble(), rand.nextDouble(),
+					rand.nextDouble(), 0.8));
 			HBox row = new HBox(remove, needle, picker);
 			row.setSpacing(4);
 			var highlighter = pane.addHighlight(HighlightPane.SELECT_TEXT).applyStyle(s -> {
@@ -76,11 +70,9 @@ public class TextSearchSample implements Sample {
 				needles.getChildren().remove(row);
 				highlighter.discard();
 			});
-			needle.textProperty().addListener((o, p, n) -> {
-				highlighter.update(HighlightPane.textMatch(n, true));
-			});
-			Platform.runLater(			() -> needle.setText(string));
-
+			needle.textProperty().addListener((o, p, n) ->
+					highlighter.update(HighlightPane.textMatch(n, true)));
+			needle.setText(string);
 			needles.getChildren().add(row);
 		};
 

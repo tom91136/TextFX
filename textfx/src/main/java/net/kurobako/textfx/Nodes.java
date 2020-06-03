@@ -1,6 +1,8 @@
 package net.kurobako.textfx;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -38,10 +40,9 @@ public class Nodes {
 		return ys;
 	}
 
-
-	public static <T> Optional<T> findParent(Parent parent, Function<Parent, Optional<T>> f) {
-		if (parent == null) return Optional.empty();
-		var current = parent;
+	public static <T> Optional<T> findParent(Node node, Function<Node, Optional<T>> f) {
+		if (node == null) return Optional.empty();
+		var current = node;
 		while (current != null) {
 			var x = f.apply(current);
 			if (x.isPresent()) return x;
@@ -49,4 +50,28 @@ public class Nodes {
 		}
 		return Optional.empty();
 	}
+
+	public static <T> Deque<T> collectParentUntil(Node node,
+	                                              boolean reverseOrder,
+	                                              Function<Node, Optional<T>> f) {
+		var out = new LinkedList<T>();
+		var current = node;
+		while (current != null) {
+			var t = f.apply(current);
+			if (t.isPresent()) {
+				if (reverseOrder)  out.push(t.get());
+				else out.add(t.get());
+			} else break;
+			current = current.getParent();
+		}
+		return out;
+	}
+
+	public static <T> Deque<T> collectAllParent(Node node,
+	                                           boolean reverseOrder,
+	                                           Function<Node, T> f) {
+		return Nodes.collectParentUntil(node, reverseOrder, x -> Optional.of(f.apply(x)));
+	}
+
+
 }

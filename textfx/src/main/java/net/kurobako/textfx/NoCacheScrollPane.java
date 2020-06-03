@@ -3,6 +3,7 @@ package net.kurobako.textfx;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 
+@SuppressWarnings("unused")
 public class NoCacheScrollPane extends ScrollPane {
 
 	private Node viewport;
@@ -17,6 +18,6 @@ public class NoCacheScrollPane extends ScrollPane {
 		});
 	}
 
-
-	public NoCacheScrollPane(Node content) {  super(content);  }
+	public NoCacheScrollPane(Node content) { super(content); }
+	public NoCacheScrollPane() { }
 }

@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
+import javafx.event.EventHandler;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.HPos;
 import javafx.geometry.Point2D;
@@ -31,7 +32,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
-import javafx.util.Pair;
 
 import static java.util.stream.Collectors.toList;
 import static javafx.scene.input.KeyCombination.CONTROL_ANY;
@@ -42,7 +42,7 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 	private final Pane selectionHighlight = new Pane();
 	private final ContextMenu menu = new ContextMenu();
 
-
+	private EventHandler<MouseEvent> filterHandler = e -> {};
 	TextSelectPaneSkin(TextSelectPane control) {
 		super(control);
 		this.pane = control;
@@ -79,6 +79,8 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 			}
 		});
 
+		pane.addEventFilter(MouseEvent.MOUSE_RELEASED,
+				e -> pane.removeEventFilter(MouseEvent.MOUSE_DRAGGED, filterHandler));
 		pane.addEventFilter(MouseEvent.MOUSE_PRESSED, initial -> {
 			initial.consume();
 			pane.requestFocus();
@@ -95,7 +97,7 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 
 			var scrollTarget = Nodes.findParent(pane, x -> {
 				if (x.getAccessibleRole() == AccessibleRole.SCROLL_PANE)
-					return Optional.of(new Pair<>(x, x.localToScene(x.getLayoutBounds())));
+					return Optional.of(x);
 				return Optional.empty();
 			});
 
@@ -111,9 +113,10 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 										originInScene.getY() <= p.bounds().getMaxY())
 								.map(Selection::single));
 			} else {
-				pane.setOnMouseDragged(rest -> {
+				filterHandler = rest -> {
 					rest.consume();
 					var current = new Point2D(rest.getX(), rest.getY());
+
 					var resolved = TextSelectPane.resolveTextBounds(textNodes);
 					pane.updateSelection(textNodes,
 							createSelectionFromPoint(resolved, origin, current));
@@ -121,7 +124,7 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 					scrollTarget.ifPresent(scrollable -> {
 						var xInScene = rest.getSceneX();
 						var yInScene = rest.getSceneY();
-						var boundInScene = scrollable.getValue();
+						var boundInScene = scrollable.localToScene(scrollable.getLayoutBounds());
 						if (boundInScene.contains(xInScene, yInScene)) return;
 						var scale = 10.0;
 						var dx = boundInScene.getCenterX() - xInScene;
@@ -136,8 +139,9 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 						));
 					});
 
+				};
+				pane.addEventFilter(MouseEvent.MOUSE_DRAGGED, filterHandler);
 
-				});
 				if (initial.getEventType() == MouseEvent.MOUSE_PRESSED) {
 					switch (initial.getButton()) {
 						case PRIMARY:
@@ -155,11 +159,12 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 
 	}
 
+
 	private void invalidateSelections() {
 		selectionHighlight.getChildren().setAll(
 				pane.selected.get().stream()
 						.map(s -> s.select(pane, pane.highlightFill))
-						.toArray(Node[]::new));
+						.collect(toList()));
 	}
 
 	private Stream<Selection> createSelectionFromPoint(List<Token> texts,
@@ -216,8 +221,6 @@ public class TextSelectPaneSkin extends SkinBase<TextSelectPane> {
 								};
 						var startHit = hitX.apply(start.text(), origin);
 						var endHit = hitX.apply(end.text(), current);
-
-//						if(startHit.getInsertionIndex() > endHit.getInsertionIndex()) return Stream.empty();
 
 						if (startIdx < endIdx) {
 							return Stream.concat(

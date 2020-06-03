@@ -12,10 +12,10 @@ public class SampleText {
 	private SampleText() { }
 
 	@SuppressWarnings("UnstableApiUsage")
-	static List<String> loremIpsum() {
+	static List<String> load(String file) {
 		try {
 			return Resources.readLines(
-					Resources.getResource("lorem_ipsum.txt"), StandardCharsets.UTF_8);
+					Resources.getResource(file), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			return Throwables.getStackTraceAsString(e).lines().collect(Collectors.toList());
 		}

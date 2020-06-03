@@ -1,0 +1,11 @@
+JavaFX is a software platform for creating and delivering desktop applications, as well as rich Internet applications (RIAs) that can run across a wide variety of devices. JavaFX is intended to replace Swing as the standard GUI library for Java SE, but both will be included for the foreseeable future. JavaFX has support for desktop computers and web browsers on Microsoft Windows, Linux, and macOS.
+
+Before version 2.0 of JavaFX, developers used a statically typed, declarative language called JavaFX Script to build JavaFX applications. Because JavaFX Script was compiled to Java bytecode, programmers could also use Java code instead. JavaFX applications could run on any desktop that could run Java SE or on any mobile phone that could run Java ME.
+
+JavaFX 2.0 and later is implemented as a "native" Java library, and applications using JavaFX are written in "native" Java code. JavaFX Script has been scrapped by Oracle, but development is being continued in the Visage project. JavaFX 2.x does not support the Solaris operating system or mobile phones; however, Oracle plans to integrate JavaFX to Java SE Embedded 8, and Java FX for ARM processors is in developer preview phase.
+
+On desktops, JavaFX supports Windows Vista, Windows 7, Windows 8, Windows 10, macOS and Linux operating systems. Beginning with JavaFX 1.2, Oracle has released beta versions for OpenSolaris. On mobile, JavaFX Mobile 1.x is capable of running on multiple mobile operating systems, including Symbian OS, Windows Mobile, and proprietary real-time operating systems.
+
+Open-source JavaFXPorts works for iOS (iPhone and iPad) and Android and embedded (Raspberry Pi); and the related commercial software created under the name "Gluon" supports the same mobile platforms with additional features plus desktop. This allows a single source code base to create applications for the desktop, iOS, and Android devices.
+
+With the release of JDK 11 in 2018, Oracle has made JavaFX part of the OpenJDK under the OpenJFX project, in order to increase the pace of its development. Oracle support for JavaFX is also available, for the current long-term version (Java JDK 8), through March 2025.

@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,7 +16,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -73,6 +71,7 @@ public class HighlightPane extends StackPane {
 
 
 	{
+		setPickOnBounds(false);
 		setAlignment(Pos.TOP_LEFT);
 		Runnable bind = () -> {
 			var node = content.get();
@@ -129,10 +128,10 @@ public class HighlightPane extends StackPane {
 				var matching = Nodes.collectNodes(parent, filter);
 				var shapes = matching.stream().flatMap(m ->
 						highlighter.apply(m).stream().peek(path -> {
-							path.getTransforms().add(m.getLocalToSceneTransform());
-							var sceneOrigin = parent.sceneToLocal(Point2D.ZERO);
-							path.setLayoutX(sceneOrigin.getX());
-							path.setLayoutY(sceneOrigin.getY());
+							path.getTransforms().setAll(Nodes.collectParentUntil(m, true,
+									x -> x == parent ?
+											Optional.empty() :
+											Optional.of(x.getLocalToParentTransform())));
 						})).peek(style).toArray(Shape[]::new);
 				this.matching.setAll(matching);
 				this.highlightShapes.setAll(shapes);

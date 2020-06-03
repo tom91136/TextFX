@@ -16,12 +16,17 @@ Controls
 Utilities
 
  * `Nodes.findParent` - Stack safe scene graph traversal from leaf to parent
- * `Nodes.collectNodes` - Stack safe scene graph traversal from node to leaves, faster than `Node.lookupAll`
+ * `Nodes.collectNodes*` - Stack safe scene graph traversal from node to leaves, faster than `Node.lookupAll`
 
 Known limitations
  * `TextSelectPane` does not work with `TextFlow` as it doesn't actually render the text using the `Text` node itself. As a workaround, use `FlowPane` with manually tokenised text nodes. 
  * `TextSelectPane` does not currently handle `Text` nodes that span multiple lines. This is an intrinsic limitation of `Text` node API as only a single start and end pair is supported.
  * Only OpenJFX 11+ is supported as the `Text` selection and shape APIs was private before this version. 
+
+
+| ![alt text](screenshots/a.png) |  ![alt text](screenshots/b.png) |  ![alt text](screenshots/c.png) |
+|---|---|---|
+| Spellchecker implemented using `HighlightPane` on a `TextArea` using [LanguageTool](https://github.com/languagetool-org/languagetool) |  A text search view implemented using `HighlightPane` |  Arbitrary text node selection with transforms in a `TextSelectPane`   |
 
 
 If you are looking to do more advanced things I recommend taking a look a [RichTextFX](https://github.com/FXMisc/RichTextFX), it does have a bit of a learning curve though.

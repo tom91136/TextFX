@@ -104,14 +104,12 @@ public class TextSelectPane extends Control {
 			token.text.setSelectionEnd(selectEnd);
 			var path = new Path(token.text.getSelectionShape());
 
-			// first apply origin's transform, including scale, shear, rotation, and translation
-			// this results in scene space coordinates
-			path.getTransforms().add(token.text.getLocalToSceneTransform());
 
-			// then, we create an offset to set it back to the origin of our local space
-			var sceneOrigin = parent.sceneToLocal(Point2D.ZERO);
-			path.setLayoutX(sceneOrigin.getX());
-			path.setLayoutY(sceneOrigin.getY());
+			path.getTransforms().setAll(Nodes.collectParentUntil(token.text, true,
+					x -> x == parent ?
+							Optional.empty() :
+							Optional.of(x.getLocalToParentTransform())));
+
 
 			path.fillProperty().bind(highlightFill);
 			path.setStroke(null);

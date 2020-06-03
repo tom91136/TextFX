@@ -1,8 +1,5 @@
 package net.kurobako.textfx.sample;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-
 import net.kurobako.textfx.NoCacheScrollPane;
 import net.kurobako.textfx.TextSelectPane;
 import net.kurobako.textfx.TextSelectPane.SelectionMode;
@@ -13,24 +10,20 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.geometry.Side;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedAreaChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -79,7 +72,8 @@ public class TextSelectSample implements Sample {
 
 
 		var loremIpsum = new FlowPane(
-				SampleText.loremIpsum().stream().flatMap(line -> Stream.of(line.split(" "))
+				SampleText.load("lorem_ipsum.txt").stream().flatMap(line -> Stream.of(line.split(
+						" "))
 						.map(text -> {
 							var label1 = new Text(text);
 							label1.setFontSmoothingType(FontSmoothingType.LCD);
@@ -126,7 +120,6 @@ public class TextSelectSample implements Sample {
 
 		pane.selectedProperty().addListener((o, p, n) -> {
 			selected.setText(String.join("\n", TextSelectPane.selectionToLines(" ").call(n)));
-
 		});
 
 
@@ -149,8 +142,6 @@ public class TextSelectSample implements Sample {
 		options.addColumn(1, mode, picker);
 		options.addRow(3, selected);
 		GridPane.setColumnSpan(selected, GridPane.REMAINING);
-
-
 
 		var scrollPane = new NoCacheScrollPane(pane);
 		scrollPane.setFitToWidth(true);
