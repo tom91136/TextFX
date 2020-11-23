@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
@@ -22,7 +23,8 @@ import javafx.scene.paint.Color;
 public class TextSearchSample implements Sample {
 
 
-	@Override public Node mkRoot() {
+	@Override
+	public Node mkRoot() {
 
 
 		String join = String.join("\n", SampleText.load("lorem_ipsum.txt"));
@@ -35,8 +37,6 @@ public class TextSearchSample implements Sample {
 
 
 		var pane = new HighlightPane(haystack);
-//		highlight.setMaxHeight(Double.MAX_VALUE);
-
 
 		var scrollPane = new NoCacheScrollPane((pane));
 		scrollPane.setFitToWidth(true);
@@ -60,7 +60,10 @@ public class TextSearchSample implements Sample {
 
 			var picker = new ColorPicker(Color.color(rand.nextDouble(), rand.nextDouble(),
 					rand.nextDouble(), 0.8));
-			HBox row = new HBox(remove, needle, picker);
+
+			var fuzzy = new CheckBox("fuzzy");
+
+			HBox row = new HBox(remove, needle, fuzzy, picker);
 			row.setSpacing(4);
 			var highlighter = pane.addHighlight(HighlightPane.SELECT_TEXT).applyStyle(s -> {
 				s.fillProperty().bind(picker.valueProperty());
@@ -70,8 +73,13 @@ public class TextSearchSample implements Sample {
 				needles.getChildren().remove(row);
 				highlighter.discard();
 			});
-			needle.textProperty().addListener((o, p, n) ->
-					highlighter.update(HighlightPane.textMatch(n, true)));
+
+			Runnable bindMatch = () -> highlighter.update(fuzzy.isSelected() ?
+					HighlightPane.textFuzzyMatch(needle.getText(), true) :
+					HighlightPane.textMatch(needle.getText(), true));
+
+			fuzzy.selectedProperty().addListener(o -> bindMatch.run());
+			needle.textProperty().addListener(o -> bindMatch.run());
 			needle.setText(string);
 			needles.getChildren().add(row);
 		};
