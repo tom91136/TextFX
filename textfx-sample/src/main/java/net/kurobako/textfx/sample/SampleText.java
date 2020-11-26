@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SampleText {
-	private SampleText() { }
+	private SampleText() {
+	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	static List<String> load(String file) {

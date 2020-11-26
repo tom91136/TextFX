@@ -44,12 +44,14 @@ public class SamplerController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		List<SampleEntry> samples = Arrays.asList(
-				new SampleEntry("Basic", TextSelectSample::new),
-		new SampleEntry("Animated", AnimatedSample::new),
-				new SampleEntry("Highlight", TextSearchSample::new),
-				new SampleEntry("Spellchecker", SpellcheckerSample::new)
+				new SampleEntry("Arbitrary text selection", TextSelectSample::new),
+				new SampleEntry("Animated text selection", AnimatedTextSelectSample::new),
+				new SampleEntry("Highlighted search", HighlightedSearchSample::new),
+				new SampleEntry("Highlighted timer", HighlightedTimerSample::new),
+				new SampleEntry("Highlighted spellchecker", HighlightedSpellcheckerSample::new),
+				new SampleEntry("Highlighted text list", HighlightedListSample::new)
 //				new SampleEntry("Arbitrary Node", ArbitraryNodeSample::new)
-		                                         );
+		);
 
 		samples.forEach(s -> tabs.getTabs().add(new Tab(s.name, s.sampleFactory.get().mkRoot())));
 

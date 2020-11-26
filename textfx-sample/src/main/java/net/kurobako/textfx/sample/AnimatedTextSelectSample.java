@@ -13,11 +13,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-public class AnimatedSample implements Sample {
-	@Override public Node mkRoot() {
+public class AnimatedTextSelectSample implements Sample {
+	@Override
+	public Node mkRoot() {
 
 
-		Label label = new Label("The quick brown fox jumps over the lazy dog");
+		Label label = new Label("Try to select me!");
 		label.setFont(Font.font(30));
 
 		label.minHeightProperty().bind(label.widthProperty());
@@ -31,6 +32,6 @@ public class AnimatedSample implements Sample {
 
 		TextSelectPane pane = new TextSelectPane(new StackPane(label));
 		label.rotateProperty().addListener(o -> pane.invalidate());
-		return  (pane);
+		return (pane);
 	}
 }

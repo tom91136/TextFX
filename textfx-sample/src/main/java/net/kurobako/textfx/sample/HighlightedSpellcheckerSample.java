@@ -34,8 +34,9 @@ import javafx.util.Pair;
 
 import static java.util.stream.Collectors.toList;
 
-public class SpellcheckerSample implements Sample {
-	@Override public Node mkRoot() {
+public class HighlightedSpellcheckerSample implements Sample {
+	@Override
+	public Node mkRoot() {
 
 		var area = new TextArea(String.join("\n", SampleText.load("javafx.txt")));
 		area.layout();
@@ -86,43 +87,49 @@ public class SpellcheckerSample implements Sample {
 				}
 			});
 
-			return  path;
+			return path;
 		}).collect(toList()));
 
-		var langTool = ThreadLocal.withInitial(() -> new JLanguageTool(new BritishEnglish()));
-
-		var ec = Executors.newCachedThreadPool();
-
 		area.scrollTopProperty().addListener(o -> highlighter.update());
-
 		area.textProperty().addListener(o -> highlighter.highlightGroup().setVisible(false));
 
 
-		Consumer<List<CharSequence>> executeSpellcheck = (xs) -> {
-			ec.submit(() -> {
-				resultRef.set(IntStream.range(0, xs.size()).boxed().parallel().flatMap(i -> {
-					try {
-						var offset = IntStream.range(0, i).map(j -> xs.get(j).length() + 1).sum();
-						return langTool.get().check(xs.get(i).toString()).stream().map(r -> new Pair<>(offset, r));
-					} catch (IOException ignored) { return Stream.empty(); }
-				}).collect(toList()));
+		var ec = Executors.newCachedThreadPool();
 
-				Platform.runLater(() -> {
-					highlighter.highlightGroup().setVisible(true);
-					highlighter.update();
+		ec.submit(() -> {
+			var langTool = ThreadLocal.withInitial(() -> new JLanguageTool(new BritishEnglish()));
+
+			Consumer<List<CharSequence>> executeSpellcheck = (xs) -> {
+				ec.submit(() -> {
+					resultRef.set(IntStream.range(0, xs.size()).boxed().parallel().flatMap(i -> {
+						try {
+							var offset = IntStream.range(0, i).map(j -> xs.get(j).length() + 1).sum();
+							return langTool.get().check(xs.get(i).toString()).stream().map(r -> new Pair<>(offset, r));
+						} catch (IOException ignored) {
+							return Stream.empty();
+						}
+					}).collect(toList()));
+
+					Platform.runLater(() -> {
+						highlighter.highlightGroup().setVisible(true);
+						highlighter.update();
+					});
 				});
-			});
-		};
+			};
 
-		area.getParagraphs().addListener(new ListChangeListener<CharSequence>() {
-			@Override public void onChanged(Change<? extends CharSequence> c) {
-				// make a copy here in case paragraph changes half way
-				executeSpellcheck.accept(new ArrayList<>(c.getList()));
-			}
+			area.getParagraphs().addListener(new ListChangeListener<CharSequence>() {
+				@Override
+				public void onChanged(Change<? extends CharSequence> c) {
+					// make a copy here in case paragraph changes half way
+					executeSpellcheck.accept(new ArrayList<>(c.getList()));
+				}
+			});
+
+			executeSpellcheck.accept(area.getParagraphs());
+
 		});
 
-		executeSpellcheck.accept(area.getParagraphs());
 
-		return (pane);
+		return pane;
 	}
 }

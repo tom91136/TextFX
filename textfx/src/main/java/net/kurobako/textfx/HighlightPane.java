@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -193,19 +193,27 @@ public class HighlightPane extends StackPane {
 			@Override
 			public Highlighter<T> update(Function<T, List<Shape>> highlighter) {
 				this.highlighter = highlighter;
-				var parent = content.get();
-				if (parent == null) return this;
-				var matching = Nodes.collectNodes(parent, filter);
-				var shapes = matching.stream().flatMap(m ->
-						highlighter.apply(m).stream().peek(path ->
-								path.getTransforms().setAll(Nodes.collectParentUntil(m, true,
-										x -> x == parent ?
-												Optional.empty() :
-												Optional.of(x.getLocalToParentTransform())))))
-						.peek(style).toArray(Shape[]::new);
-				this.matching.setAll(matching);
-				this.highlightShapes.setAll(shapes);
-				group.getChildren().setAll(shapes);
+				var child = content.get();
+				if (child == null) return this;
+				final Runnable applyHighlight = () -> {
+					var matching = Nodes.collectNodes(child, filter);
+					var shapes = new ArrayList<Shape>();
+					for (T m : matching) {
+						for (Shape path : highlighter.apply(m)) {
+							path.getTransforms().setAll(Nodes.collectParentUntil(m, true,
+									x -> x == child ?
+											Optional.empty() :
+											Optional.of(x.getLocalToParentTransform())));
+							style.accept(path);
+							shapes.add(path);
+						}
+					}
+					this.matching.setAll(matching);
+					this.highlightShapes.setAll(shapes);
+					group.getChildren().setAll(shapes);
+				};
+				if (child.isNeedsLayout()) Platform.runLater(applyHighlight);
+				else applyHighlight.run();
 				return this;
 			}
 
@@ -228,4 +236,5 @@ public class HighlightPane extends StackPane {
 		super.layoutChildren();
 		updateAll();
 	}
+
 }

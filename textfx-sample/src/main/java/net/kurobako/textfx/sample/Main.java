@@ -6,12 +6,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main   {
+public class Main {
 
-	public static void main(String[] args) { Application.launch(JFXApp.class, args); }
+	public static void main(String[] args) {
+		Application.launch(JFXApp.class, args);
+	}
 
 
-	public static final class JFXApp extends Application{
+	public static final class JFXApp extends Application {
 
 		@Override
 		public void start(Stage primaryStage) throws Exception {
@@ -23,7 +25,6 @@ public class Main   {
 			primaryStage.show();
 		}
 	}
-
 
 
 }

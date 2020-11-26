@@ -40,7 +40,8 @@ import javafx.scene.text.Text;
 import static java.util.stream.Collectors.toCollection;
 
 public class TextSelectSample implements Sample {
-	@Override public Node mkRoot() {
+	@Override
+	public Node mkRoot() {
 
 		var division = 30;
 		var range = 2.0 * Math.PI;

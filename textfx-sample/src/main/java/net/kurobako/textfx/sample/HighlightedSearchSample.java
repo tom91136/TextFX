@@ -5,9 +5,10 @@ import net.kurobako.textfx.NoCacheScrollPane;
 import net.kurobako.textfx.sample.SamplerController.Sample;
 
 import java.util.Random;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -20,7 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class TextSearchSample implements Sample {
+public class HighlightedSearchSample implements Sample {
 
 
 	@Override
@@ -50,7 +51,7 @@ public class TextSearchSample implements Sample {
 		var rand = new Random(42);
 
 
-		Consumer<String> addRow = string -> {
+		BiConsumer<String, Boolean> addRow = (initial, isFuzzy) -> {
 
 			var needle = new TextField();
 
@@ -58,12 +59,16 @@ public class TextSearchSample implements Sample {
 			var remove = new Button("Remove");
 
 
-			var picker = new ColorPicker(Color.color(rand.nextDouble(), rand.nextDouble(),
-					rand.nextDouble(), 0.8));
+			var picker = new ColorPicker(Color.color(
+					rand.nextDouble(),
+					rand.nextDouble(),
+					rand.nextDouble(), 0.3));
 
 			var fuzzy = new CheckBox("fuzzy");
+			fuzzy.setSelected(isFuzzy);
 
-			HBox row = new HBox(remove, needle, fuzzy, picker);
+			HBox row = new HBox(remove, needle, picker, fuzzy);
+			row.setAlignment(Pos.CENTER);
 			row.setSpacing(4);
 			var highlighter = pane.addHighlight(HighlightPane.SELECT_TEXT).applyStyle(s -> {
 				s.fillProperty().bind(picker.valueProperty());
@@ -80,15 +85,15 @@ public class TextSearchSample implements Sample {
 
 			fuzzy.selectedProperty().addListener(o -> bindMatch.run());
 			needle.textProperty().addListener(o -> bindMatch.run());
-			needle.setText(string);
+			needle.setText(initial);
 			needles.getChildren().add(row);
 		};
 
-		addNeedle.setOnAction(e -> addRow.accept(""));
-		addRow.accept("Lorem");
-		addRow.accept("IPSUM");
-		addRow.accept("Sit");
-		addRow.accept(",");
+		addNeedle.setOnAction(e -> addRow.accept("", false));
+		addRow.accept("Lorem", false);
+		addRow.accept("IPSUM", false);
+		addRow.accept("sit", true);
+		addRow.accept(",", true);
 
 		var searchView = new VBox(
 				addNeedle,
